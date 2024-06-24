@@ -1,6 +1,7 @@
 library intl_phone_field;
 
 import 'dart:async';
+
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -202,6 +203,9 @@ class IntlPhoneField extends StatefulWidget {
   /// Default value is `true`.
   final bool showCountryFlag;
 
+  /// The style use for the country flag text.
+  final TextStyle? flagTextStyle;
+
   /// Message to be displayed on autoValidate error
   ///
   /// Default value is `Invalid Mobile Number`.
@@ -284,6 +288,7 @@ class IntlPhoneField extends StatefulWidget {
     this.autofocus = false,
     this.textInputAction,
     this.autovalidateMode = AutovalidateMode.onUserInteraction,
+    this.flagTextStyle,
     this.showCountryFlag = true,
     this.cursorColor,
     this.disableLengthCheck = false,
@@ -319,14 +324,13 @@ class _IntlPhoneFieldState extends State<IntlPhoneField> {
     if (widget.initialCountryCode == null && number.startsWith('+')) {
       number = number.substring(1);
       // parse initial value
-      _selectedCountry = countries.firstWhere((country) => number.startsWith(country.fullCountryCode),
-          orElse: () => _countryList.first);
+      _selectedCountry = countries.firstWhere((country) => number.startsWith(country.fullCountryCode), orElse: () => _countryList.first);
 
       // remove country code from the initial number value
       number = number.replaceFirst(RegExp("^${_selectedCountry.fullCountryCode}"), "");
     } else {
-      _selectedCountry = _countryList.firstWhere((item) => item.code == (widget.initialCountryCode ?? 'US'),
-          orElse: () => _countryList.first);
+      _selectedCountry =
+          _countryList.firstWhere((item) => item.code == (widget.initialCountryCode ?? 'US'), orElse: () => _countryList.first);
 
       // remove country code from the initial number value
       if (number.startsWith('+')) {
@@ -464,9 +468,7 @@ class _IntlPhoneFieldState extends State<IntlPhoneField> {
                 const SizedBox(
                   width: 4,
                 ),
-                if (widget.enabled &&
-                    widget.showDropdownIcon &&
-                    widget.dropdownIconPosition == IconPosition.leading) ...[
+                if (widget.enabled && widget.showDropdownIcon && widget.dropdownIconPosition == IconPosition.leading) ...[
                   widget.dropdownIcon,
                   const SizedBox(width: 4),
                 ],
@@ -479,7 +481,7 @@ class _IntlPhoneFieldState extends State<IntlPhoneField> {
                         )
                       : Text(
                           _selectedCountry.flag,
-                          style: const TextStyle(fontSize: 18),
+                          style: widget.flagTextStyle ?? const TextStyle(fontSize: 18),
                         ),
                   const SizedBox(width: 8),
                 ],
@@ -489,9 +491,7 @@ class _IntlPhoneFieldState extends State<IntlPhoneField> {
                     style: widget.dropdownTextStyle,
                   ),
                 ),
-                if (widget.enabled &&
-                    widget.showDropdownIcon &&
-                    widget.dropdownIconPosition == IconPosition.trailing) ...[
+                if (widget.enabled && widget.showDropdownIcon && widget.dropdownIconPosition == IconPosition.trailing) ...[
                   const SizedBox(width: 4),
                   widget.dropdownIcon,
                 ],
